@@ -21,17 +21,17 @@
 
 
 module riscv_pipeline(
-    input wire        clk,
+    input wire        clk_in,
     input wire        rst_n,
     output reg [31:0] pc            // 程序计数器
 );
 
 // 内部信号声明
-wire [31:0] pc_if, pc_predict_if, instruction_if; // IF级信号, PC, PC+4, 指令, 输出
+wire [31:0] pc_if, pc_predict_if, pc_p4_if, instruction_if; // IF级信号, PC, PC+4, 指令, 输出
 
 wire [4:0]  rs1_addr_id, rs2_addr_id, rd_addr_id; // ID级寄存器地址, 在译码阶段从指令中获取
 wire [31:0] immediate_id, rs1_data_id, rs2_data_id; // ID级立即数和寄存器数据
-wire [31:0] pc_id;                // ID级PC和PC+4
+wire [31:0] pc_id, pc_p4_id;                // ID级PC和PC+4
 wire [6:0]  opcode_id, funct7_id;               // ID级操作码和功能码7
 wire [2:0]  funct3_id;             // ID级功能码3
 wire reg_write_id, mem_read_id, mem_write_id, branch_id, branch_cond_ne_id, jump_id, alu_src_id, mem_to_reg_id;
@@ -67,6 +67,13 @@ always @(posedge clk or negedge rst_n) begin
     end
 end
 
+clock clock_inst(
+    .clk_in1(clk_in),
+    .resetn(rst_n),
+    .locked(),
+    .clk_out1(clk)
+);
+
 // 取指级实例化
 if_stage if_stage_inst(
     .clk(clk),
@@ -76,6 +83,7 @@ if_stage if_stage_inst(
     .correct_pc(correct_pc_ex),
     .pc_predict(pc_predict_if), // 预测的PC值
     .pc_out(pc_if), // 当前PC输出
+    .pc_p4_out(pc_p4_if), // 当前PC+4输出
     .instruction(instruction_if)
 );
 
@@ -92,11 +100,22 @@ regfile regfile_inst(
     .rs2_data(rs2_data_id)  
 );
 
-// 控制单元实例化
-control_unit control_unit_inst(
+// 译码级实例化
+id_stage id_stage_inst(
+    .clk(clk),
+    .rst_n(rst_n),
+    .load_use_hazard(load_use_hazard),
+    .control_hazard(control_hazard),
+    .instruction(instruction_if),
+    .pc(pc_if),
+    .pc_p4(pc_p4_if),
+    .rs1_addr(rs1_addr_id),
+    .rs2_addr(rs2_addr_id),
+    .rd_addr(rd_addr_id),
+    .immediate(immediate_id),
+    .pc_out(pc_id),
+    .pc_p4_out(pc_p4_id),
     .opcode(opcode_id),
-    .funct3(funct3_id),
-    .funct7(funct7_id),
     .reg_write(reg_write_id),
     .mem_read(mem_read_id),
     .mem_write(mem_write_id),
@@ -108,24 +127,6 @@ control_unit control_unit_inst(
     .mem_to_reg(mem_to_reg_id)
 );
 
-// 译码级实例化
-id_stage id_stage_inst(
-    .clk(clk),
-    .rst_n(rst_n),
-    .load_use_hazard(load_use_hazard),
-    .control_hazard(control_hazard),
-    .instruction(instruction_if),
-    .pc(pc_if),
-    .rs1_addr(rs1_addr_id),
-    .rs2_addr(rs2_addr_id),
-    .rd_addr(rd_addr_id),
-    .immediate(immediate_id),
-    .pc_out(pc_id),
-    .opcode(opcode_id),
-    .funct3(funct3_id),
-    .funct7(funct7_id)
-);
-
 // 执行级实例化
 ex_stage ex_stage_inst(
     .clk(clk),
@@ -135,6 +136,7 @@ ex_stage ex_stage_inst(
     .rd_addr(rd_addr_id),
     .immediate(immediate_id),
     .pc(pc_id),
+    .pc_p4(pc_p4_id),
     .opcode(opcode_id),
     .reg_write(reg_write_id),
     .mem_read(mem_read_id),

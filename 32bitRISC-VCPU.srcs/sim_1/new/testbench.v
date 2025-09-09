@@ -23,21 +23,21 @@
 module testbench();
 
 // 时钟和复位信号
-reg clk;
+reg clk_in;
 reg rst_n;
 wire [31:0] pc;
 
 // 实例化流水线处理器
 riscv_pipeline processor(
-    .clk(clk),
+    .clk_in(clk_in),
     .rst_n(rst_n),
     .pc(pc)
 );
 
 // 时钟生成
 initial begin
-    clk = 0;
-    forever #5 clk = ~clk; // 100MHz时钟
+    clk_in = 0;
+    forever #5 clk_in = ~clk_in; // 100MHz时钟
 end
 
 // 测试序列
@@ -66,7 +66,7 @@ end
 // end
 
 // 在每个时钟上升沿显示流水线状态
-always @(posedge clk) begin
+always @(posedge clk_in) begin
     if (rst_n) begin
         $display("=== 时钟周期 %0d ===", $time/10);
         $display("IF级: PC=%h, predict_pc=%h, 指令=%h", processor.pc_if, processor.pc_predict_if, processor.instruction_if);

@@ -27,14 +27,23 @@ module id_stage(
     input wire        control_hazard,       // 控制冒险信号
     input wire [31:0] instruction, // 指令
     input wire [31:0] pc,         // PC值
+    input wire [31:0] pc_p4,      // PC + 4
     output reg [4:0]  rs1_addr,   // 源寄存器1地址
     output reg [4:0]  rs2_addr,   // 源寄存器2地址
     output reg [4:0]  rd_addr,    // 目标寄存器地址
     output reg [31:0] immediate,  // 立即数
     output reg [31:0] pc_out,     // PC输出
+    output reg [31:0] pc_p4_out,  // PC + 4输出
     output reg [6:0]  opcode,     // 操作码
-    output reg [2:0]  funct3,     // 功能码3
-    output reg [6:0]  funct7      // 功能码7
+    output reg        reg_write,  // 寄存器写使能
+    output reg        mem_read,   // 内存读使能
+    output reg        mem_write,  // 内存写使能
+    output reg        branch,     // 分支指令
+    output reg        branch_cond_ne, // 分支条件
+    output reg        jump,       // 跳转指令
+    output reg        alu_src,    // ALU源操作数选择
+    output reg [3:0]  alu_op,     // ALU操作码
+    output reg        mem_to_reg // 写回数据选择
 );
 
 // 指令类型定义
@@ -72,6 +81,25 @@ assign immediate_in = (opcode_in == I_TYPE || opcode_in == I_LOAD || opcode_in =
                       (opcode_in == J_JAL) ? imm_j : // J型
                       32'd0;
 
+wire reg_write_out, mem_read_out, mem_write_out, branch_out, branch_cond_ne_out, jump_out, alu_src_out, mem_to_reg_out;
+wire [3:0] alu_op_out;
+
+// 控制单元实例化
+control_unit control_unit_inst(
+    .opcode(opcode_in),
+    .funct3(funct3_in),
+    .funct7(funct7_in),
+    .reg_write(reg_write_out),
+    .mem_read(mem_read_out),
+    .mem_write(mem_write_out),
+    .branch(branch_out),
+    .branch_cond_ne(branch_cond_ne_out),
+    .jump(jump_out),
+    .alu_src(alu_src_out),
+    .alu_op(alu_op_out),
+    .mem_to_reg(mem_to_reg_out)
+);
+
 // 流水线寄存器更新
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
@@ -80,9 +108,17 @@ always @(posedge clk or negedge rst_n) begin
         rd_addr <= 5'd0;
         immediate <= 32'd0;
         pc_out <= 32'd0;
+        pc_p4_out <= 32'd0;
         opcode <= 7'd0;
-        funct3 <= 3'd0;
-        funct7 <= 7'd0;
+        reg_write <= 1'b0;
+        mem_read <= 1'b0;
+        mem_write <= 1'b0;
+        branch <= 1'b0;
+        branch_cond_ne <= 1'b0;
+        jump <= 1'b0;
+        alu_src <= 1'b0;
+        alu_op <= 4'd0;
+        mem_to_reg <= 1'b0;
     end else if (load_use_hazard) begin
         // 保持当前状态，不更新
     end else if(control_hazard) begin
@@ -92,9 +128,17 @@ always @(posedge clk or negedge rst_n) begin
         rd_addr <= 5'd0;
         immediate <= 32'd0;
         pc_out <= 32'd0;
+        pc_p4_out <= 32'd0;
         opcode <= 7'd0;
-        funct3 <= 3'd0;
-        funct7 <= 7'd0;
+        reg_write <= 1'b0;
+        mem_read <= 1'b0;
+        mem_write <= 1'b0;
+        branch <= 1'b0;
+        branch_cond_ne <= 1'b0;
+        jump <= 1'b0;
+        alu_src <= 1'b0;
+        alu_op <= 4'd0;
+        mem_to_reg <= 1'b0;
     end else begin
         // 正常更新
         rs1_addr <= rs1_in;
@@ -102,9 +146,17 @@ always @(posedge clk or negedge rst_n) begin
         rd_addr <= rd_in;
         immediate <= immediate_in;
         pc_out <= pc;
+        pc_p4_out <= pc_p4;
         opcode <= opcode_in;
-        funct3 <= funct3_in;
-        funct7 <= funct7_in;
+        reg_write <= reg_write_out;
+        mem_read <= mem_read_out;
+        mem_write <= mem_write_out;
+        branch <= branch_out;
+        branch_cond_ne <= branch_cond_ne_out;
+        jump <= jump_out;
+        alu_src <= alu_src_out;
+        alu_op <= alu_op_out;
+        mem_to_reg <= mem_to_reg_out;
     end
 end
 

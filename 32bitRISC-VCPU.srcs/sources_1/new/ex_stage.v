@@ -28,6 +28,7 @@ module ex_stage(
     input wire [4:0]  rd_addr,   // 目标寄存器地址
     input wire [31:0] immediate, // 立即数
     input wire [31:0] pc,        // PC值
+    input wire [31:0] pc_p4,     // PC + 4值
     input wire [6:0]  opcode,    // 操作码
     input wire        reg_write, // 寄存器写使能
     input wire        mem_read,  // 内存读使能
@@ -95,7 +96,7 @@ wire control_instruction = branch || jump;
 // 正确的PC值计算
 wire [31:0] correct_pc_wire = branch_taken_wire ? branch_target_wire :
                              jump_taken_wire ? jump_target_wire :
-                             pc + 4;
+                             pc_p4;
 
 // ALU结果选择
 wire [31:0] alu_result_select = (opcode == I_JALR || opcode == J_JAL) ? jump_target_wire :

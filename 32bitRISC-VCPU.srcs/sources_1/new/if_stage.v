@@ -28,12 +28,13 @@ module if_stage(
     input wire [31:0] correct_pc,        // 正确的PC值
     output reg [31:0] pc_predict,    // 预测的PC值
     output reg [31:0] pc_out,            // 程序计数器
+    output reg [31:0] pc_p4_out,         // PC + 4
     output reg [31:0] instruction    // 当前指令
 );
 
 reg boot;
 
-reg [31:0] pc_current1, pc_predict1, pc_current2, pc_predict2;
+reg [31:0] pc_current1, pc_predict1, pc_current2, pc_predict2, pc_p4_2;
 wire [31:0] douta;
 wire rsta_busy;
 
@@ -47,9 +48,11 @@ always @(posedge clk or negedge rst_n) begin
 
         pc_current2 <= 32'd0;
         pc_predict2 <= 32'd0;
+        pc_p4_2 <= 32'd0;
 
         pc_out <= 32'd0;
         pc_predict <= 32'd0;
+        pc_p4_out <= 32'd0;
         instruction <= 32'd0;
 
         boot <= 1'b0;
@@ -62,9 +65,11 @@ always @(posedge clk or negedge rst_n) begin
 
         pc_current2 <= 32'd0;
         pc_predict2 <= 32'd0;
+        pc_p4_2 <= 32'd0;
 
         pc_out <= 32'd0;
         pc_predict <= 32'd0;
+        pc_p4_out <= 32'd0;
         instruction <= 32'd0;
 
         boot <= 1'b0;
@@ -74,15 +79,18 @@ always @(posedge clk or negedge rst_n) begin
 
         pc_current2 <= pc_current1;
         pc_predict2 <= pc_predict1;
+        pc_p4_2 <= pc_current1 + 32'd4;
         boot <= 1'b1;
         
         if (boot) begin
             pc_out <= pc_current2;
             pc_predict <= pc_predict2;
+            pc_p4_out <= pc_p4_2;
             instruction <= douta;
         end else begin
             pc_out <= 32'd0;
             pc_predict <= 32'd0;
+            pc_p4_out <= 32'd0;
             instruction <= 32'd0;
         end
     end

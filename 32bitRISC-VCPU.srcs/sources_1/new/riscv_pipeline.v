@@ -43,10 +43,9 @@ wire        reg_write_ex, mem_read_ex, mem_write_ex, mem_to_reg_ex; // EX¼¶¿ØÖÆÐ
 wire        control_ex; // EX¼¶ÊÇ·ñÎª¿ØÖÆÖ¸Áî
 wire [31:0] correct_pc_ex; // EX¼¶ÕýÈ·µÄPCÖµ
 
-wire [4:0]  rd_addr_mem;               // MEM¼¶Ä¿±ê¼Ä´æÆ÷µØÖ·
+wire [4:0]  rd_addr_mem, rd_addr_inner_mem;               // MEM¼¶Ä¿±ê¼Ä´æÆ÷µØÖ·
 wire [31:0] alu_result_mem, mem_data_mem;
 wire        reg_write_mem, mem_to_reg_mem;
-wire [31:0] rs2_data_mem; // MEM¼¶Ô´¼Ä´æÆ÷2Êý¾Ý
 
 wire [4:0]  rd_addr_wb; // WB¼¶Ä¿±ê¼Ä´æÆ÷µØÖ·
 wire [31:0] rd_data_wb; // WB¼¶Ð´»ØÊý¾Ý
@@ -172,11 +171,12 @@ mem_stage mem_stage_inst(
     .mem_write(mem_write_ex),
     .mem_to_reg(mem_to_reg_ex),
     .rd_addr_out(rd_addr_mem),
+    .rd_addr_inner_out(rd_addr_inner_mem),
     .alu_result_out(alu_result_mem),
     .mem_data(mem_data_mem),
     .reg_write_out(reg_write_mem),
     .mem_to_reg_out(mem_to_reg_mem),
-    .rs2_data_out(rs2_data_mem)
+    .mem_to_reg_inner_out(mem_to_reg_inner_mem)
 );
 
 // Ð´»Ø¼¶ÊµÀý»¯
@@ -198,7 +198,9 @@ hazard_unit hazard_unit_inst(
     .rs1_id(rs1_addr_id),
     .rs2_id(rs2_addr_id),
     .rd_ex(rd_addr_ex),
-    .mem_read_ex(mem_read_ex),
+    .rd_mem_inner(rd_addr_inner_mem),
+    .mem_to_reg_ex(mem_to_reg_ex),
+    .mem_to_reg_inner_mem(mem_to_reg_inner_mem),
     .control_ex(control_ex),
     .correct_pc_ex(correct_pc_ex),
     .pc_id(pc_id),

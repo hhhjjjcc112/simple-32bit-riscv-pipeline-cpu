@@ -83,8 +83,8 @@ always @(posedge clk_in) begin
             processor.rs2_data_ex,
             processor.reg_write_ex, processor.mem_read_ex, processor.mem_write_ex, processor.mem_to_reg_ex,
             processor.control_ex, processor.correct_pc_ex);
-        $display("MEM级: rd=%d, 内存读取数据=%h, 内存写回数据=%h, reg_write=%b, mem_to_reg=%b",
-            processor.rd_addr_mem, processor.mem_data_mem, processor.rs2_data_mem,
+        $display("MEM级: rd=%d, 内存读取数据=%h, reg_write=%b, mem_to_reg=%b",
+            processor.rd_addr_mem, processor.mem_data_mem, 
             processor.reg_write_mem, processor.mem_to_reg_mem);
         $display("WB级: rd=%d, 写回数据=%h, reg_write=%b",
             processor.rd_addr_wb, processor.rd_data_wb,

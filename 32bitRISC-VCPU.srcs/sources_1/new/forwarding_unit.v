@@ -55,28 +55,33 @@ always @(*) begin
     forward_b = FORWARD_NONE;
     
     // 检测a的前递
-    if (reg_write_ex && (rd_ex != 5'd0) && (rd_ex == rs1_id)) begin
-        rs1_data_forwarded = alu_result_ex;
-        forward_a = FORWARD_EX;
-    end else if (reg_write_mem && (rd_mem != 5'd0) && (rd_mem == rs1_id)) begin
-        rs1_data_forwarded = mem_to_reg_mem ? mem_data_mem : alu_result_mem;
-        forward_a = FORWARD_MEM;
-    end else if (reg_write_wb && (rd_wb != 5'd0) && (rd_wb == rs1_id)) begin
-        rs1_data_forwarded = alu_result_wb;
-        forward_a = FORWARD_WB;
+    if (rs1_id != 5'd0) begin
+        if (reg_write_ex && (rd_ex == rs1_id)) begin
+            rs1_data_forwarded = alu_result_ex;
+            forward_a = FORWARD_EX;
+        end else if (reg_write_mem && (rd_mem == rs1_id)) begin
+            rs1_data_forwarded = mem_to_reg_mem ? mem_data_mem : alu_result_mem;
+            forward_a = FORWARD_MEM;
+        end else if (reg_write_wb && (rd_wb == rs1_id)) begin
+            rs1_data_forwarded = alu_result_wb;
+            forward_a = FORWARD_WB;
+        end
     end
 
     // 检测b的前递
-    if (reg_write_ex && (rd_ex != 5'd0) && (rd_ex == rs2_id)) begin
-        rs2_data_forwarded = alu_result_ex;
-        forward_b = FORWARD_EX;
-    end else if (reg_write_mem && (rd_mem != 5'd0) && (rd_mem == rs2_id)) begin
-        rs2_data_forwarded = mem_to_reg_mem ? mem_data_mem : alu_result_mem;
-        forward_b = FORWARD_MEM;
-    end else if (reg_write_wb && (rd_wb != 5'd0) && (rd_wb == rs2_id)) begin
-        rs2_data_forwarded = alu_result_wb;
-        forward_b = FORWARD_WB;
+    if (rs2_id != 5'd0) begin
+        if (reg_write_ex && (rd_ex != 5'd0) && (rd_ex == rs2_id)) begin
+            rs2_data_forwarded = alu_result_ex;
+            forward_b = FORWARD_EX;
+        end else if (reg_write_mem && (rd_mem != 5'd0) && (rd_mem == rs2_id)) begin
+            rs2_data_forwarded = mem_to_reg_mem ? mem_data_mem : alu_result_mem;
+            forward_b = FORWARD_MEM;
+        end else if (reg_write_wb && (rd_wb != 5'd0) && (rd_wb == rs2_id)) begin
+            rs2_data_forwarded = alu_result_wb;
+            forward_b = FORWARD_WB;
+        end
     end
+    
 end
 
 endmodule

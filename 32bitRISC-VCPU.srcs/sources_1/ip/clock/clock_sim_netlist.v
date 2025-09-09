@@ -1,10 +1,10 @@
 // Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
-// Date        : Tue Sep  9 10:23:58 2025
+// Date        : Tue Sep  9 10:14:06 2025
 // Host        : LAPTOP-RF714NVU running 64-bit major release  (build 9200)
-// Command     : write_verilog -force -mode funcsim
-//               C:/Users/hjch1/32bitRISC-VCPU/32bitRISC-VCPU.srcs/sources_1/ip/clock/clock_sim_netlist.v
+// Command     : write_verilog -force -mode funcsim -rename_top clock -prefix
+//               clock_ clock_sim_netlist.v
 // Design      : clock
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -35,7 +35,6 @@ module clock
         .resetn(resetn));
 endmodule
 
-(* ORIG_REF_NAME = "clock_clk_wiz" *) 
 module clock_clock_clk_wiz
    (clk_out1,
     resetn,
@@ -97,7 +96,7 @@ module clock_clock_clk_wiz
     .CLKFBOUT_USE_FINE_PS("FALSE"),
     .CLKIN1_PERIOD(10.000000),
     .CLKIN2_PERIOD(0.000000),
-    .CLKOUT0_DIVIDE_F(20.000000),
+    .CLKOUT0_DIVIDE_F(12.500000),
     .CLKOUT0_DUTY_CYCLE(0.500000),
     .CLKOUT0_PHASE(0.000000),
     .CLKOUT0_USE_FINE_PS("FALSE"),

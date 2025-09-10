@@ -1,10 +1,10 @@
 -- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
--- Date        : Tue Sep  9 10:23:58 2025
+-- Date        : Wed Sep 10 20:54:07 2025
 -- Host        : LAPTOP-RF714NVU running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode funcsim -rename_top clock -prefix
---               clock_ clock_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim
+--               C:/Users/hjch1/32bitRISC-VCPU/32bitRISC-VCPU.srcs/sources_1/ip/clock/clock_sim_netlist.vhdl
 -- Design      : clock
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -21,6 +21,8 @@ entity clock_clock_clk_wiz is
     locked : out STD_LOGIC;
     clk_in1 : in STD_LOGIC
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of clock_clock_clk_wiz : entity is "clock_clk_wiz";
 end clock_clock_clk_wiz;
 
 architecture STRUCTURE of clock_clock_clk_wiz is

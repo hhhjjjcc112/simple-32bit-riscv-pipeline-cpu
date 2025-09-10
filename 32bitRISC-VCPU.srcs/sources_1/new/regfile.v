@@ -29,7 +29,8 @@ module regfile(
     input wire [31:0] rd_data,     // 写回数据
     input wire        reg_write,   // 寄存器写使能
     output wire [31:0] rs1_data,   // 源寄存器1数据
-    output wire [31:0] rs2_data    // 源寄存器2数据
+    output wire [31:0] rs2_data,    // 源寄存器2数据
+    output wire [31:0] example       // 寄存器数据（用于显示）
 );
 
 reg [31:0] registers [31:0]; // 32个32位寄存器
@@ -39,6 +40,8 @@ integer i;
 // 读操作（组合逻辑）
 assign rs1_data = (rs1_addr == 5'd0) ? 32'd0 : registers[rs1_addr];
 assign rs2_data = (rs2_addr == 5'd0) ? 32'd0 : registers[rs2_addr];
+
+assign example = registers[5'd7]; // x1寄存器数据输出
 
 // 写操作（时序逻辑）
 always @(posedge clk or negedge rst_n) begin

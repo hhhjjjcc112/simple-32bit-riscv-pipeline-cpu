@@ -23,8 +23,13 @@
 module riscv_pipeline(
     input wire        clk_in,
     input wire        rst_n,
-    output reg [31:0] pc            // 程序计数器
+    output wire [3:0] digit_low,
+    output wire [3:0] digit_high,
+    output wire [7:0] disp_low,
+    output wire [7:0] disp_high
 );
+
+wire clk, locked;
 
 // 内部信号声明
 wire [31:0] pc_if, pc_predict_if, pc_p4_if, instruction_if; // IF级信号, PC, PC+4, 指令, 输出
@@ -58,18 +63,12 @@ wire load_use_hazard, control_hazard;
 wire [1:0] forward_a, forward_b;
 wire [31:0] rs1_data_forwarded, rs2_data_forwarded; // 前递后的寄存器数据
 
-always @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
-        pc <= 32'd0;
-    end else begin
-        pc <= pc_if; // 更新PC为IF级的PC输出
-    end
-end
+wire [31:0] display_example; // 用于显示的寄存器数据
 
 clock clock_inst(
     .clk_in1(clk_in),
     .resetn(rst_n),
-    .locked(),
+    .locked(locked),
     .clk_out1(clk)
 );
 
@@ -78,7 +77,7 @@ clock clock_inst(
 // 取指级实例化
 if_stage if_stage_inst(
     .clk(clk),
-    .rst_n(rst_n),
+    .rst_n(rst_n & locked),
     .load_use_hazard(load_use_hazard),
     .control_hazard(control_hazard),
     .correct_pc(correct_pc_ex),
@@ -91,20 +90,21 @@ if_stage if_stage_inst(
 // 寄存器堆实例化
 regfile regfile_inst(
     .clk(clk),
-    .rst_n(rst_n),
+    .rst_n(rst_n & locked),
     .rs1_addr(rs1_addr_id), 
     .rs2_addr(rs2_addr_id), 
     .rd_addr(rd_addr_wb),   
     .rd_data(rd_data_wb),   
     .reg_write(reg_write_wb),  
     .rs1_data(rs1_data_id),
-    .rs2_data(rs2_data_id)  
+    .rs2_data(rs2_data_id),
+    .example(display_example)
 );
 
 // 译码级实例化
 id_stage id_stage_inst(
     .clk(clk),
-    .rst_n(rst_n),
+    .rst_n(rst_n & locked),
     .load_use_hazard(load_use_hazard),
     .control_hazard(control_hazard),
     .instruction(instruction_if),
@@ -131,7 +131,7 @@ id_stage id_stage_inst(
 // 执行级实例化
 ex_stage ex_stage_inst(
     .clk(clk),
-    .rst_n(rst_n),
+    .rst_n(rst_n & locked),
     .load_use_hazard(load_use_hazard),
     .control_hazard(control_hazard),
     .rd_addr(rd_addr_id),
@@ -164,7 +164,7 @@ ex_stage ex_stage_inst(
 // 访存级实例化
 mem_stage mem_stage_inst(
     .clk(clk),
-    .rst_n(rst_n),
+    .rst_n(rst_n & locked),
     .rd_addr(rd_addr_ex),
     .alu_result(alu_result_ex),
     .rs2_data(rs2_data_ex),
@@ -182,7 +182,7 @@ mem_stage mem_stage_inst(
 // 写回级实例化
 wb_stage wb_stage_inst(
     .clk(clk),
-    .rst_n(rst_n),
+    .rst_n(rst_n & locked),
     .rd_addr(rd_addr_mem),
     .alu_result(alu_result_mem),
     .mem_data(mem_data_mem),
@@ -227,6 +227,17 @@ forwarding_unit forwarding_unit_inst(
     .rs2_data_forwarded(rs2_data_forwarded),
     .forward_a(forward_a),
     .forward_b(forward_b)
+);
+
+// 数码管显示模块实例化
+light_show light_show_inst (
+    .clk(clk),
+    .rst_n(rst_n & locked),
+    .numbers(display_example),               //要显示的数字
+    .disp_low(disp_low),           //七段数码管段选信号, 低4个数字
+    .disp_high(disp_high),         //七段数码管段选信号, 高4个数字
+    .digit_low(digit_low),         //数码管位选信号, 低4个数字
+    .digit_high(digit_high)        //数码管位选信号, 高4个数字
 );
 
 endmodule

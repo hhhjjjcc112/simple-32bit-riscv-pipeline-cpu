@@ -25,13 +25,18 @@ module testbench();
 // 时钟和复位信号
 reg clk_in;
 reg rst_n;
-wire [31:0] pc;
+
+wire [3:0] digit_high, digit_low;
+wire [7:0] disp_high, disp_low;
 
 // 实例化流水线处理器
 riscv_pipeline processor(
     .clk_in(clk_in),
     .rst_n(rst_n),
-    .pc(pc)
+    .digit_low(digit_low),
+    .digit_high(digit_high),
+    .disp_low(disp_low),
+    .disp_high(disp_high)
 );
 
 // 时钟生成

@@ -32,6 +32,8 @@ module if_stage(
     output reg [31:0] instruction    // 当前指令
 );
 
+parameter MAX_PC = 32'h00000fff; // 最大PC值, 假设指令存储器大小为4KB
+
 reg boot;
 
 reg [31:0] pc_current1, pc_predict1, pc_current2, pc_predict2, pc_p4_2;
@@ -73,6 +75,11 @@ always @(posedge clk or negedge rst_n) begin
         instruction <= 32'd0;
 
         boot <= 1'b0;
+    end else if(pc_predict1 > MAX_PC) begin
+        pc_out <= 32'd0;
+        pc_predict <= 32'd0;
+        pc_p4_out <= 32'd0;
+        instruction <= 32'd0;
     end else begin
         pc_predict1 <= pc_predict1 + 32'd4; // 预测下一个PC
         pc_current1 <= pc_predict1;

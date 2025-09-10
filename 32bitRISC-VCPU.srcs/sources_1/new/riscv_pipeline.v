@@ -66,14 +66,14 @@ always @(posedge clk or negedge rst_n) begin
     end
 end
 
-// clock clock_inst(
-//     .clk_in1(clk_in),
-//     .resetn(rst_n),
-//     .locked(),
-//     .clk_out1(clk)
-// );
+clock clock_inst(
+    .clk_in1(clk_in),
+    .resetn(rst_n),
+    .locked(),
+    .clk_out1(clk)
+);
 
-assign clk = clk_in; // 直接使用输入时钟
+// assign clk = clk_in; // 直接使用输入时钟
 
 // 取指级实例化
 if_stage if_stage_inst(

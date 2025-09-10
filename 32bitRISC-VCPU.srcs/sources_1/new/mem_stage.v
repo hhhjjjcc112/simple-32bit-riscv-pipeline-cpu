@@ -31,12 +31,10 @@ module mem_stage(
     input wire        mem_write,  // 内存写使能
     input wire        mem_to_reg, // 写回数据选择
     output reg [4:0]  rd_addr_out,   // 目标寄存器地址输出
-    output reg [4:0]  rd_addr_inner_out,   // 目标寄存器地址输出
     output reg [31:0] alu_result_out, // ALU结果输出
-    output reg [31:0] mem_data,      // 内存数据
+    output wire [31:0] mem_data,      // 内存数据
     output reg        reg_write_out, // 寄存器写使能输出
-    output reg        mem_to_reg_out,// 写回数据选择输出
-    output reg        mem_to_reg_inner_out// 写回数据选择输出
+    output reg        mem_to_reg_out// 写回数据选择输出
 );
 
 // // 数据存储器（简化实现）
@@ -53,10 +51,6 @@ module mem_stage(
 //     end
 // end
 
-wire [31:0] mem_data_read;
-reg [31:0] alu_result_inner, rs2_data_inner;
-reg reg_write_inner, mem_read_inner;
-
 
 data_memory dm_inst (
   .clka(clk),    // input wire clka
@@ -67,7 +61,7 @@ data_memory dm_inst (
   .clkb(clk),    // input wire clkb
   .enb(mem_read),      // input wire enb
   .addrb(alu_result[17:2]),  // input wire [15 : 0] addrb
-  .doutb(mem_data_read)  // output wire [31 : 0] doutb
+  .doutb(mem_data)  // output wire [31 : 0] doutb
 );
 
 // 流水线寄存器更新
@@ -75,29 +69,15 @@ always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         rd_addr_out <= 5'd0;
         alu_result_out <= 32'd0;
-        mem_data <= 32'd0;
         reg_write_out <= 1'b0;
         mem_to_reg_out <= 1'b0;
 
-        rd_addr_inner_out <= 5'd0;
-        alu_result_inner <= 32'd0;
-        reg_write_inner <= 1'b0;
-        mem_to_reg_inner_out <= 1'b0;
-        mem_read_inner <= 1'b0;
-
     end else begin
         // 正常更新
-        rd_addr_out <= rd_addr_inner_out;
-        alu_result_out <= alu_result_inner;
-        mem_data <= (mem_read_inner) ? mem_data_read : 32'd0;
-        reg_write_out <= reg_write_inner;
-        mem_to_reg_out <= mem_to_reg_inner_out;
-
-        rd_addr_inner_out <= rd_addr;
-        alu_result_inner <= alu_result;
-        reg_write_inner <= reg_write;
-        mem_to_reg_inner_out <= mem_to_reg;
-        mem_read_inner <= mem_read;
+        rd_addr_out <= rd_addr;
+        alu_result_out <= alu_result;
+        reg_write_out <= reg_write;
+        mem_to_reg_out <= mem_to_reg;
     end
 end
 

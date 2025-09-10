@@ -66,12 +66,14 @@ always @(posedge clk or negedge rst_n) begin
     end
 end
 
-clock clock_inst(
-    .clk_in1(clk_in),
-    .resetn(rst_n),
-    .locked(),
-    .clk_out1(clk)
-);
+// clock clock_inst(
+//     .clk_in1(clk_in),
+//     .resetn(rst_n),
+//     .locked(),
+//     .clk_out1(clk)
+// );
+
+assign clk = clk_in; // 直接使用输入时钟
 
 // 取指级实例化
 if_stage if_stage_inst(
@@ -171,12 +173,10 @@ mem_stage mem_stage_inst(
     .mem_write(mem_write_ex),
     .mem_to_reg(mem_to_reg_ex),
     .rd_addr_out(rd_addr_mem),
-    .rd_addr_inner_out(rd_addr_inner_mem),
     .alu_result_out(alu_result_mem),
     .mem_data(mem_data_mem),
     .reg_write_out(reg_write_mem),
-    .mem_to_reg_out(mem_to_reg_mem),
-    .mem_to_reg_inner_out(mem_to_reg_inner_mem)
+    .mem_to_reg_out(mem_to_reg_mem)
 );
 
 // 写回级实例化
@@ -198,9 +198,7 @@ hazard_unit hazard_unit_inst(
     .rs1_id(rs1_addr_id),
     .rs2_id(rs2_addr_id),
     .rd_ex(rd_addr_ex),
-    .rd_mem_inner(rd_addr_inner_mem),
     .mem_to_reg_ex(mem_to_reg_ex),
-    .mem_to_reg_inner_mem(mem_to_reg_inner_mem),
     .control_ex(control_ex),
     .correct_pc_ex(correct_pc_ex),
     .pc_id(pc_id),

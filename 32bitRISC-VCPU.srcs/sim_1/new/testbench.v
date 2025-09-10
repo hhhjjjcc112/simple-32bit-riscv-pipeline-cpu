@@ -37,7 +37,7 @@ riscv_pipeline processor(
 // 时钟生成
 initial begin
     clk_in = 0;
-    forever #5 clk_in = ~clk_in; // 100MHz时钟
+    forever #10 clk_in = ~clk_in; // 50MHz时钟
 end
 
 // 测试序列
@@ -68,13 +68,13 @@ end
 // 在每个时钟上升沿显示流水线状态
 always @(posedge clk_in) begin
     if (rst_n) begin
-        $display("=== 时钟周期 %0d ===", $time/10);
+        $display("=== 时钟周期 %0d ===", $time/20);
         $display("IF级: PC=%h, predict_pc=%h, 指令=%h", processor.pc_if, processor.pc_predict_if, processor.instruction_if);
-        $display("ID级: rs1=%d, rs2=%d, rd=%d, 立即数=%h, rs1_data=%h, rs2_data=%h, PC=%h, opcode=%b, funct3=%b, funct7=%b, reg_write=%b, mem_read=%b, mem_write=%b, branch=%b, jump=%b, alu_src=%b, mem_to_reg=%b, alu_op=%b",
+        $display("ID级: rs1=%d, rs2=%d, rd=%d, 立即数=%h, rs1_data=%h, rs2_data=%h, PC=%h, opcode=%b, reg_write=%b, mem_read=%b, mem_write=%b, branch=%b, jump=%b, alu_src=%b, mem_to_reg=%b, alu_op=%b",
             processor.rs1_addr_id, processor.rs2_addr_id, processor.rd_addr_id,
             processor.immediate_id, processor.rs1_data_id, processor.rs2_data_id,
             processor.pc_id,
-            processor.opcode_id, processor.funct3_id, processor.funct7_id,
+            processor.opcode_id, 
             processor.reg_write_id, processor.mem_read_id, processor.mem_write_id,
             processor.branch_id, processor.jump_id, processor.alu_src_id, processor.mem_to_reg_id,
             processor.alu_op_id);

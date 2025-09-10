@@ -24,9 +24,7 @@ module hazard_unit(
     input wire [4:0] rs1_id,      // ID级源寄存器1地址
     input wire [4:0] rs2_id,      // ID级源寄存器2地址
     input wire [4:0] rd_ex,       // EX级目标寄存器地址
-    input wire [4:0] rd_mem_inner,      // MEM级目标寄存器地址1
     input wire       mem_to_reg_ex,  // EX级内存读使能
-    input wire       mem_to_reg_inner_mem,  // MEM级内存读使能1
     input wire       control_ex,      // EX级是否为控制指令
     input wire [31:0] correct_pc_ex,  // EX级正确的PC值
     input wire [31:0] pc_id,        // ID级PC值
@@ -40,15 +38,11 @@ always @(*) begin
     if (rs1_id != 5'd0) begin
         if (mem_to_reg_ex && (rd_ex == rs1_id)) begin
             load_use_hazard = 1'b1;
-        end else if (mem_to_reg_inner_mem && (rd_mem_inner == rs1_id)) begin
-            load_use_hazard = 1'b1;
         end else begin
             load_use_hazard = 1'b0;
         end
     end else if (rs2_id != 5'd0) begin
         if (mem_to_reg_ex && (rd_ex == rs2_id)) begin
-            load_use_hazard = 1'b1;
-        end else if (mem_to_reg_inner_mem && (rd_mem_inner == rs2_id)) begin
             load_use_hazard = 1'b1;
         end else begin
             load_use_hazard = 1'b0;

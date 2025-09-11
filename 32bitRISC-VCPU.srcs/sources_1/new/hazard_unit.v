@@ -35,21 +35,9 @@ module hazard_unit(
 always @(*) begin
     
     // 加载使用冒险, 如果mem阶段需要读内存, ex阶段读的寄存器是要写的寄存器
-    if (rs1_id != 5'd0) begin
-        if (mem_to_reg_ex && (rd_ex == rs1_id)) begin
-            load_use_hazard = 1'b1;
-        end else begin
-            load_use_hazard = 1'b0;
-        end
-    end else if (rs2_id != 5'd0) begin
-        if (mem_to_reg_ex && (rd_ex == rs2_id)) begin
-            load_use_hazard = 1'b1;
-        end else begin
-            load_use_hazard = 1'b0;
-        end
-    end else begin
-        load_use_hazard = 1'b0;
-    end
+    load_use_hazard = mem_to_reg_ex && 
+                      ((rd_ex == rs1_id) || (rd_ex == rs2_id)) && (rd_ex != 5'd0);
+    
     
     // 控制冒险, 分支或跳转指令且预测错误
     control_hazard = control_ex && (correct_pc_ex != pc_id);

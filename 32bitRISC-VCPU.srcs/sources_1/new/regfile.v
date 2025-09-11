@@ -41,7 +41,7 @@ integer i;
 assign rs1_data = (rs1_addr == 5'd0) ? 32'd0 : registers[rs1_addr];
 assign rs2_data = (rs2_addr == 5'd0) ? 32'd0 : registers[rs2_addr];
 
-assign example = registers[5'd7]; // x1寄存器数据输出
+assign example = registers[5'd1]; // x1寄存器数据输出
 
 // 写操作（时序逻辑）
 always @(posedge clk or negedge rst_n) begin

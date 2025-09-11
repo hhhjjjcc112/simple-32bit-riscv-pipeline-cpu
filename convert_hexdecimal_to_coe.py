@@ -1,6 +1,6 @@
 def main():
-    input_filename = 'test_program.hex'  # 输入文件名，请根据实际文件修改
-    output_filename = 'test_program.coe'  # 输出文件名，请根据实际需要修改
+    input_filename = input("请输入源文件路径:")
+    output_filename = input("请输入目标文件名称:")
 
     with open(input_filename, 'r') as f_in:
         lines = f_in.readlines()
